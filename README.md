@@ -42,7 +42,7 @@ To build and run this project, you will need:
 
 1. Clone the repository:
 ```bash
-git clone https://your-repository-url.git
+git clone https://github.com/t0wbo2t/ray_tracer.git
 cd Ray.Tracer
 ```
 2. Install the necessary dependencies (**SDL3** and **GLM**).
@@ -85,4 +85,4 @@ This will load a sample scene with **Phong shading, reflections, and soft shadow
 
 ## License
 
-This project is licensed under the GNU GENERAL PUBLIC License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the GNU General Public License - see the [LICENSE](LICENSE) file for details.
