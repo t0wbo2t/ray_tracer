@@ -33,6 +33,9 @@ bool rtx::Sphere::intersects_with(const RayHandler &ray, glm::dvec3 &int_pt, glm
       } else {
         int_pt = ray.point_ux + (v_hat * t2);
       }
+
+      local_normal = glm::normalize(int_pt);
+
       return true;
     }
   } else {

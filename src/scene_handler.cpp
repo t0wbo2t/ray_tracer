@@ -8,6 +8,11 @@ rtx::Scene::Scene() {
   camera.set_screen_width(0.25);
   camera.set_aspect(16.0 / 9.0);
   camera.update_geometry();
+
+  shapes.push_back(std::make_shared<rtx::Sphere>());
+  light_sources.push_back(std::make_shared<rtx::PointLight>());
+  light_sources.at(0)->light_location = glm::dvec3{5.0, -10.0, -5.0};
+  light_sources.at(0)->light_color = glm::dvec3{0xFF, 0xFF, 0xFF};
 }
 
 bool rtx::Scene::render(ImageHandler& image) {
@@ -36,19 +41,34 @@ bool rtx::Scene::render(ImageHandler& image) {
       // Geneate ray for this pixel.
       camera.ray_handler(x_norm, y_norm, camera_ray);
 
-      // Test intersection
-      bool intersect = sphere.intersects_with(camera_ray, intersection_point, local_normal, local_color);
+      for(auto shape : shapes) {
+        bool intersect = shape->intersects_with(camera_ray, intersection_point, local_normal, local_color);
 
-      if(intersect) {
-        // Compute distance between camera and the point of intersection.
-        double dist = glm::length(intersection_point - camera_ray.point_ux);
-  
-        max_dist = std::max(max_dist, dist);
-        min_dist = std::min(min_dist, dist);
+        if(intersect) {
+          // Compute intensity
+          double intensity;
+          glm::dvec3 color;
+          bool illumination = false;
+          
+          for(auto current_light : light_sources) {
+            illumination = current_light->compute_illumination(intersection_point, local_normal,
+                                                               shapes, shape, color, intensity);
+          } 
 
-        image.set_pixel(x, y, 0xFF - ((dist - 9.0) / 0.94605) * 0xFF, 0.0, 0.0);
-      } else {
-        image.set_pixel(x, y, 0.0, 0.0, 0.0);
+          // Compute distance between camera and the point of intersection.
+          double dist = glm::length(intersection_point - camera_ray.point_ux);
+    
+          max_dist = std::max(max_dist, dist);
+          min_dist = std::min(min_dist, dist);
+
+          if(illumination) {
+            image.set_pixel(x, y, 0xFF * intensity, 0.0, 0.0);
+          } else {
+            image.set_pixel(x, y, 0.0, 0.0, 0.0);
+          }
+        } else {
+          image.set_pixel(x, y, 0.0, 0.0, 0.0);
+        }
       }
     }
   }

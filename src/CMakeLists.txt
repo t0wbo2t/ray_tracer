@@ -6,6 +6,8 @@ set(SOURCES
     ray_tracer.cpp
     shapes.cpp
     sphere.cpp
+    light_sources.cpp
+    point_light.cpp
 )
 
 add_library(rtracer
